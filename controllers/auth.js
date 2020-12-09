@@ -8,7 +8,6 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.signup = (req, res) => {
     const { name, email, password } = req.body;
-    console.log('made it 1');
     User.findOne({ email }).exec((err, user) => {
         if(user) {
             return res.status(400).json({
@@ -16,7 +15,6 @@ exports.signup = (req, res) => {
             })
         }
         const token = jwt.sign({ name, email, password }, process.env.JWT_ACCOUNT_ACTIVATION, { expiresIn: '10m' });
-        console.log('made it 2');
         const emailData ={
             from: process.env.EMAIL_FROM,
             to: email,
@@ -29,7 +27,6 @@ exports.signup = (req, res) => {
                 <p>${process.env.CLIENT_URL}</p>
             `
         }
-        console.log('made it 3', emailData);
 
         sgMail.send(emailData).then(sent => {
             console.log('SIGNUP EMAIL SENT');
@@ -79,3 +76,31 @@ exports.accountActivation = (req, res) => {
         })
     }
 }
+
+
+exports.signin = (req, res) => {
+    const { email, password } = req.body;
+
+    // check for existing user
+    User.findOne({email}).exec((err, user) => {
+        if(err || !user) {
+            return res.status(400).json({
+                error: 'User with that email does not exist. Please signup'
+            })
+        }
+        // authenticate
+        if(!user.authenticate(password)) {
+            return res.status(400).json({
+                error: 'Email and password do not match'
+            })
+        }
+        // generate token and send to client
+        const token = jwt.sign({ _id: user._id}, process.env.JWT_SECRET, {expiresIn: '7d' });
+        const { _id, name, email, role } = user;
+
+        return res.json({
+            token,
+            user: { _id, name, email, role }
+        });
+    });
+};
