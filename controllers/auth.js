@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const expressJwt = require('express-jwt');
 
 // sendgrid setup
 const sgMail = require('@sendgrid/mail');
@@ -102,5 +103,31 @@ exports.signin = (req, res) => {
             token,
             user: { _id, name, email, role }
         });
+    });
+}
+
+
+// Middleware
+
+exports.requireSignIn = expressJwt({
+    secret: process.env.JWT_SECRET,  // black magic that will populate req.user - need to explore
+    algorithms: ['HS256']
+});
+
+exports.adminMiddleware = (req, res, next) => {
+    User.findById(req.user._id).exec((err, user) => {
+        if(err || !user) {
+            return res.status(400).json({
+                error: 'User not found'
+            });
+        }
+
+        if(user.role !== 'admin') {
+            return res.status(400).json({
+                error: 'Admin resource. Access denied'
+            })
+        }
+        req.profile = user;
+        next();
     });
 };
