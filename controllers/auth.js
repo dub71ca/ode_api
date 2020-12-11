@@ -131,3 +131,46 @@ exports.adminMiddleware = (req, res, next) => {
         next();
     });
 };
+
+exports.forgotPassword = (req, res) => {
+    const {email} = req.body;
+
+    User.findOne({ email }, (err, user) => {
+        if(err || !user) {
+            return res.status(400).json({
+                error: 'User with that email does not exist'
+            });
+        }
+ 
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_RESET_PASSWORD, { expiresIn: '10m' });
+        const emailData ={
+            from: process.env.EMAIL_FROM,
+            to: email,
+            subject: 'Reset password link',
+            html: `
+                <p>Please use the following link to reset your password</p>
+                <p>${process.env.CLIENT_URL}/auth/password/reset/${token}</p>
+                <hr />
+                <p>This email may contain sensitive information</>
+                <p>${process.env.CLIENT_URL}</p>
+            `
+        };
+
+        sgMail.send(emailData).then(sent => {
+            console.log('RESET_PASSWORD_EMAIL_SENT');
+            return res.json({
+                message: `Email sent to ${email}. Follow instructions to reset password`
+            });
+        })
+        .catch(err => {
+            //console.log('RESET_PASSWORD_EMAIL_SENT_ERROR', err)
+            return res.json({
+                message: err.message
+            });
+        });
+    });
+};
+
+exports.resetPassword = (req, res) => {
+    
+}
