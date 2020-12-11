@@ -186,7 +186,7 @@ exports.resetPassword = (req, res) => {
     const { resetPasswordLink, newPassword } = req.body;
 
     if(resetPasswordLink) {
-        jwt.verify(resetPasswordLink, process.env.JWT_RESET_PASSWORD, function(err, decoded) {
+        jwt.verify(resetPasswordLink, process.env.JWT_RESET_PASSWORD, (err, decoded) => {
             if(err) {
                 return res.status(400).json({
                     error: 'Expired link. Try again.'
@@ -202,7 +202,7 @@ exports.resetPassword = (req, res) => {
 
                 const updatedFields = {
                     password: newPassword,
-                    resetPasswordLink = ''
+                    resetPasswordLink: '',
                 }
 
                 user = _.extend(user, updatedFields);
