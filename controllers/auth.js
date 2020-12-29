@@ -185,9 +185,12 @@ exports.forgotPassword = (req, res) => {
 exports.resetPassword = (req, res) => {
     const { resetPasswordLink, newPassword } = req.body;
 
+    console.log("made it here", resetPasswordLink);
+
     if(resetPasswordLink) {
         jwt.verify(resetPasswordLink, process.env.JWT_RESET_PASSWORD, (err, decoded) => {
             if(err) {
+                console.log("expired");
                 return res.status(400).json({
                     error: 'Expired link. Try again.'
                 });
@@ -195,6 +198,7 @@ exports.resetPassword = (req, res) => {
 
             User.findOne({resetPasswordLink}, (err, user) => {
                 if(err || !user) {
+                    console.log("cannot find user");
                     return res.status(400).json({
                         error: 'Reset password failed. Please try again.'
                     });
@@ -204,6 +208,8 @@ exports.resetPassword = (req, res) => {
                     password: newPassword,
                     resetPasswordLink: '',
                 }
+
+                console.log("update user", updatedFields);
 
                 user = _.extend(user, updatedFields);
 
