@@ -143,6 +143,8 @@ exports.forgotPassword = (req, res) => {
                 error: 'User with that email does not exist'
             });
         }
+
+        console.log("user", user);
  
         const token = jwt.sign({ _id: user._id }, process.env.JWT_RESET_PASSWORD, { expiresIn: '10m' });
         const emailData ={
@@ -158,7 +160,7 @@ exports.forgotPassword = (req, res) => {
             `
         };
 
-        return User.updateOne({resetPasswordLink: token}, (err, success) => {
+        return User.updateOne({ email }, {resetPasswordLink: token}, (err, success) => {
             if(err) {
                 console.log('RESET_PASSWORD_LINK_ERROE', err);
                 return res.status(400).json({
@@ -185,42 +187,36 @@ exports.forgotPassword = (req, res) => {
 exports.resetPassword = (req, res) => {
     const { resetPasswordLink, newPassword } = req.body;
 
-    console.log("made it here", resetPasswordLink);
-
-    if(resetPasswordLink) {
-        jwt.verify(resetPasswordLink, process.env.JWT_RESET_PASSWORD, (err, decoded) => {
-            if(err) {
-                console.log("expired");
+    if (resetPasswordLink) {
+        jwt.verify(resetPasswordLink, process.env.JWT_RESET_PASSWORD, function(err, decoded) {
+            if (err) {
                 return res.status(400).json({
-                    error: 'Expired link. Try again.'
+                    error: 'Expired link. Try again'
                 });
             }
 
-            User.findOne({resetPasswordLink}, (err, user) => {
-                if(err || !user) {
-                    console.log("cannot find user");
+            User.findOne({ resetPasswordLink }, (err, user) => {
+                if (err || !user) {
                     return res.status(400).json({
-                        error: 'Reset password failed. Please try again.'
+                        error: 'Something went wrong. Try later'
                     });
-                };
+                }
 
                 const updatedFields = {
                     password: newPassword,
-                    resetPasswordLink: '',
-                }
-
-                console.log("update user", updatedFields);
+                    resetPasswordLink: ''
+                };
 
                 user = _.extend(user, updatedFields);
 
                 user.save((err, result) => {
-                    if(err) {
+                    if (err) {
                         return res.status(400).json({
                             error: 'Error resetting user password'
                         });
                     }
                     res.json({
-                        message: 'Password successfully reset.'
+                        message: `Great! Now you can login with your new password`
                     });
                 });
             });
