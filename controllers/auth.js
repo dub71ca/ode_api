@@ -261,7 +261,13 @@ exports.googleLogin = (req, res) => {
                 return res.status(400).json({
                 });
             }
+        })
+    .catch(error => {
+        res.json({
+            error: 'Google login failed. Try again later.'
         });
+    })
+
 };
 
 exports.facebookLogin = (req, res) => {
