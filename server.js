@@ -6,10 +6,17 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const app = express();
+const fs = require('fs');
+const util = require('util');
 
-//disable console logging if in production
+//redirect console logging to debug.log if in production
 if (process.env.NODE_ENV === 'production') {
-    console.log = function () {};
+    let logFile = fs.createWriteStream(__dirname + '/debug.log', { flags: 'a' });
+
+    console.log = function() { //
+        logFile.write(util.format.apply(null, arguments) + '\n');
+    };
+    console.error = console.log;
 }
 
 // db connect

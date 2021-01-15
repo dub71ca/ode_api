@@ -229,7 +229,7 @@ exports.googleLogin = (req, res) => {
     const { idToken } = req.body;
 
     client.verifyIdToken({ idToken, audience: process.env.GOOGLE_CLIENT_ID }).then(response => {
-        console.log('GOOGLE LOGIN RESPONSE',response)
+        // console.log('GOOGLE LOGIN RESPONSE',response)
         const { email_verified, name, email } = response.payload;
         if (email_verified) {
             User.findOne({ email }).exec((err, user) => {
@@ -245,7 +245,7 @@ exports.googleLogin = (req, res) => {
                     user = new User({ name, email, password });
                     user.save((err, data) => {
                         if (err) {
-                            console.log('ERROR_GOOGLE_LOGIN_ON_USER_SAVE', err);
+                            console.log('ERROR GOOGLE LOGIN ON USER SAVE', err);
                             return res.status(400).json({
                                 error: 'User signup failed with google'
                             });
