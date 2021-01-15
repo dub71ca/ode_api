@@ -7,6 +7,11 @@ const mongoose = require('mongoose');
 
 const app = express();
 
+//disable console logging if in production
+if (process.env.NODE_ENV === 'production') {
+    console.log = function () {};
+}
+
 // db connect
 mongoose
     .connect(process.env.DATABASE, {
