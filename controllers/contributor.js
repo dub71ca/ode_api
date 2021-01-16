@@ -1,6 +1,6 @@
 const Contributor = require('../models/contributor');
 
-getContributors = async (req, res) => {
+exports.getContributors = async (req, res) => {
     await Contributor.find({} , (err, contributor) => {
         if(err) {
             return res.status(400).json({ success: false, error: err })
@@ -12,7 +12,7 @@ getContributors = async (req, res) => {
     }).catch(err => console.log(err))
 }
 
-insertContributor = async (req, res) => {
+exports.insertContributor = async (req, res) => {
     const body = req.body;
 
     if(!body) {
@@ -36,8 +36,5 @@ insertContributor = async (req, res) => {
         })
     })
     .catch(error => {
-        return res.status(400).json({ error, message: "Error creating contributor", })
-    })
+        return res.status(400).json({ error, message: "Error creating contributor", })    })
 }
-
-module.exports = { getContributors, insertContributor }
