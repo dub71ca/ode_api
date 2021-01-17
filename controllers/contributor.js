@@ -12,6 +12,18 @@ exports.getContributors = async (req, res) => {
     }).catch(err => console.log(err))
 }
 
+exports.getRegisteredContributions = async (req, res) => {
+    await Contributor.find({userID: req.params.id} , (err, contributor) => {
+        if(err) {
+            return res.status(400).json({ success: false, error: err })
+        }
+        if(!contributor.length) {
+            return res.status(404).json({ success: false, error: 'No contributors found for this user'})
+        }
+        return res.status(200).json({ success: true, data: contributor })
+    }).catch(err => console.log(err))
+}
+
 exports.insertContributor = async (req, res) => {
     const body = req.body;
 
