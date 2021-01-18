@@ -18,7 +18,7 @@ exports.getRegisteredContributions = async (req, res) => {
             return res.status(400).json({ success: false, error: err })
         }
         if(!contributor.length) {
-            return res.status(404).json({ success: false, error: 'No contributors found for this user'})
+            return res.status(404).json({ success: false, error: 'No contributions found for this user'})
         }
         return res.status(200).json({ success: true, data: contributor })
     }).catch(err => console.log(err))
@@ -50,3 +50,40 @@ exports.insertContributor = async (req, res) => {
     .catch(error => {
         return res.status(400).json({ error, message: "Error creating contributor", })    })
 }
+
+exports. updateContributor = async (req, res) => {
+    const body = req.body;
+
+    if(!body) {
+        return res.status(400).json({
+            success: false,
+            error: "You must provide a contribution",
+        });
+    }
+
+    console.log('body', body);
+
+    await Contributor.findOne({_id: body.editID} , (err, contribution) => {
+        if(err || !contribution) {
+            return res.status(400).json({ success: false, error: 'Contribution not found' })
+        }
+
+         console.log('contribution', contribution);
+         contribution.plan = body.plan;
+         contribution.title = body.title;
+         contribution.description = body.description;
+         contribution.link = body.link;
+         contribution.contact = body.contact;
+     
+         console.log("contribution", contribution);
+         contribution.save((err, updatedContribution) => {
+             if(err) {
+                 console.log('UPDATED_CONTRIBUTION_ERROR', err)
+                 return res.status(400).json({
+                     error: 'Contribution update failed'
+                 })
+             }
+             res.json(updatedContribution);
+         });
+    });
+};
