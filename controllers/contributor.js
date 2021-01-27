@@ -24,6 +24,18 @@ exports.getRegisteredContributions = async (req, res) => {
     }).catch(err => console.log(err))
 }
 
+exports.deleteContribution = async (req, res) => {
+    await Contributor.deleteOne( { _id: req.params.id }, (err) => {
+        if(err) {
+            return res.status(400).json({ success: false, error: err })
+        }
+        return res.status(200).json({ success: true })
+    })
+    .catch(error => {
+        return res.status(400).json({ error, message: "Error creating contributor", })    
+    })
+}
+
 exports.insertContributor = async (req, res) => {
     const body = req.body;
 
