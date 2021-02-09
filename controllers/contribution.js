@@ -1,42 +1,42 @@
-const Contributor = require('../models/contributor');
+const Contribution = require('../models/contribution');
 
-exports.getContributors = async (req, res) => {
-    await Contributor.find({} , (err, contributor) => {
+exports.getContributions = async (req, res) => {
+    await Contribution.find({} , (err, contribution) => {
         if(err) {
             return res.status(400).json({ success: false, error: err })
         }
-        if(!contributor.length) {
-            return res.status(404).json({ success: false, error: 'No contributors found'})
+        if(!contribution.length) {
+            return res.status(404).json({ success: false, error: 'No contributions found'})
         }
-        return res.status(200).json({ success: true, data: contributor })
+        return res.status(200).json({ success: true, data: contribution })
     }).catch(err => console.log(err))
 }
 
 exports.getRegisteredContributions = async (req, res) => {
-    await Contributor.find({userID: req.params.id} , (err, contributor) => {
+    await Contribution.find({userID: req.params.id} , (err, contribution) => {
         if(err) {
             return res.status(400).json({ success: false, error: err })
         }
-        if(!contributor.length) {
+        if(!contribution.length) {
             return res.status(404).json({ success: false, error: 'No contributions found for this user'})
         }
-        return res.status(200).json({ success: true, data: contributor })
+        return res.status(200).json({ success: true, data: contribution })
     }).catch(err => console.log(err))
 }
 
 exports.deleteContribution = async (req, res) => {
-    await Contributor.deleteOne( { _id: req.params.id }, (err) => {
+    await Contribution.deleteOne( { _id: req.params.id }, (err) => {
         if(err) {
             return res.status(400).json({ success: false, error: err })
         }
         return res.status(200).json({ success: true })
     })
     .catch(error => {
-        return res.status(400).json({ error, message: "Error creating contributor", })    
+        return res.status(400).json({ error, message: "Error deleting contribution", })    
     })
 }
 
-exports.insertContributor = async (req, res) => {
+exports.insertContribution = async (req, res) => {
     const body = req.body;
 
     if(!body) {
@@ -46,24 +46,24 @@ exports.insertContributor = async (req, res) => {
         });
     }
 
-    const contributor = new Contributor(body);
+    const contribution = new Contribution(body);
 
-    if(!contributor) {
+    if(!contribution) {
         return res.status(400).json({success: false, error: err })
     }
 
-    contributor.save().then(() => {
+    contribution.save().then(() => {
         return res.status(201).json({
             success: true,
-            id: contributor._id,
-            message: "Contributor created",
+            id: contribution._id,
+            message: "Contribution created",
         })
     })
     .catch(error => {
-        return res.status(400).json({ error, message: "Error creating contributor", })    })
+        return res.status(400).json({ error, message: "Error creating contribution", })    })
 }
 
-exports. updateContributor = async (req, res) => {
+exports. updateContribution = async (req, res) => {
     const body = req.body;
 
     if(!body) {
@@ -75,7 +75,7 @@ exports. updateContributor = async (req, res) => {
 
     console.log('body', body);
 
-    await Contributor.findOne({_id: body.editID} , (err, contribution) => {
+    await Contribution.findOne({_id: body.editID} , (err, contribution) => {
         if(err || !contribution) {
             return res.status(400).json({ success: false, error: 'Contribution not found' })
         }

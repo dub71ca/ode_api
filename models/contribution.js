@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const contributorSchema = new mongoose.Schema ({
+const contributionSchema = new mongoose.Schema ({
     userID: {
         type: String,
         trim: true,
@@ -39,4 +39,4 @@ const contributorSchema = new mongoose.Schema ({
     },
 });
 
-module.exports = mongoose.model("Contributor", contributorSchema);
+module.exports = mongoose.model("Contribution", contributionSchema);
