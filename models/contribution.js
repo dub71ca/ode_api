@@ -13,6 +13,11 @@ const contributionSchema = new mongoose.Schema ({
         required: true,
         max: 32,
     },
+    isActive: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
     title: {
         type: String,
         trim: true,
