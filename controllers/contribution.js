@@ -24,6 +24,18 @@ exports.getRegisteredContributions = async (req, res) => {
     }).catch(err => console.log(err))
 }
 
+exports.getContributionDetails = async (req, res) => {
+    await Contribution.find({_id: req.params.id} , (err, contribution) => {
+        if(err) {
+            return res.status(400).json({ success: false, error: err })
+        }
+        if(!contribution.length) {
+            return res.status(404).json({ success: false, error: 'No contributions found for this user'})
+        }
+        return res.status(200).json({ success: true, data: contribution })
+    }).catch(err => console.log(err))
+}
+
 exports.deleteContribution = async (req, res) => {
     await Contribution.deleteOne( { _id: req.params.id }, (err) => {
         if(err) {
